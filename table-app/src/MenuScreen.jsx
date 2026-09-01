@@ -1,5 +1,4 @@
 import { Avatar, Photo } from './ui.jsx';
-import { ME, SEATED } from './config.js';
 import { fmt } from './money.js';
 
 export function MenuScreen({ menu, s, d, act }) {
@@ -9,19 +8,17 @@ export function MenuScreen({ menu, s, d, act }) {
       <div class="menu-head">
         <div class="brand-row">
           <div class="brand">코치<span>포차</span></div>
-          <div class="table-tag">TABLE {d.tableId}{d.seeded ? ` · ${SEATED} SEATED` : ''}</div>
+          <div class="table-tag">TABLE {d.tableId} · {d.people.length}/{d.maxPeople} ON CHECK</div>
         </div>
-        {d.seeded && (
-          <button class="party" onClick={() => d.cartCount ? act.go('cart') : null} aria-label="Guests at this table">
-            <span class="av-stack">
-              <Avatar {...ME} />
-              {d.others.map(p => <Avatar key={p.id} {...p} />)}
-              {SEATED > d.people.length && <Avatar id="+1" color="#3a3a44" tc="#f6eede" label={`+${SEATED - d.people.length}`} />}
-            </span>
-            <span class="label">Ordering together · one bill</span>
-            <span class="link">Split</span>
-          </button>
-        )}
+        <button class="party" onClick={() => act.openIdentity(false)} aria-label="People on this check">
+          <span class="av-stack">
+            {d.people.slice(0, 4).map(p => <Avatar key={p.id} {...p} />)}
+            {!d.people.length && <span class="av av-26 av-empty">+</span>}
+            {d.people.length > 4 && <Avatar id="+" color="#3a3a44" tc="#f6eede" label={`+${d.people.length - 4}`} />}
+          </span>
+          <span class="label">{d.currentGuest ? `Ordering as ${d.currentGuest.name}` : 'Tap to add your name'}</span>
+          <span class="link">{d.canAddPeople ? 'Join' : 'Full'}</span>
+        </button>
       </div>
 
       <div class="menu-body">
@@ -60,13 +57,11 @@ export function MenuScreen({ menu, s, d, act }) {
         </section>
       </div>
 
-      {/* Only surface the floating cart once *I* have ordered — seeded demo guests
-          shouldn't make the CTA show items/total before I add my own item. */}
-      {d.myCount > 0 && (
+      {d.cartCount > 0 && (
         <button class="cartbar" onClick={() => act.go('cart')}>
           <span class="count" key={d.cartCount}>{d.cartCount}</span>
           <span class="t">
-            <b>{d.seeded ? `Table cart · ${d.ordering} ordering` : 'Your order'}</b>
+            <b>Table cart · {d.ordering || 1} ordering</b>
             <small>{s.roundsSent ? `Round ${s.roundsSent} sent · add round ${s.roundsSent + 1}` : "Send to kitchen when everyone's in"}</small>
           </span>
           <span class="total">{fmt(d.subtotal)}</span>

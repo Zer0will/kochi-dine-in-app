@@ -1,5 +1,4 @@
 import { Avatar, Photo, TopBar } from './ui.jsx';
-import { ME } from './config.js';
 import { fmt } from './money.js';
 
 export function CartScreen({ s, d, act }) {
@@ -8,64 +7,52 @@ export function CartScreen({ s, d, act }) {
 
   return (
     <div class="view enter-right">
-      <TopBar onBack={() => act.go('menu')} title="TABLE CART" sub={`Table ${d.tableId} · one bill · ${d.roundLabel}`} />
+      <TopBar onBack={() => act.go('menu')} title="TABLE CART" sub={`Table ${d.tableId} · ${d.people.length || 0} on check · ${d.roundLabel}`} />
 
       <div class="cart-scroll sc">
-        <div class="person">
-          <Avatar {...ME} size={28} />
-          <span class="name">{ME.name} <span>· you</span></span>
-          <span class="rule" />
-          <span class="sub">{fmt(d.mySub)}</span>
-        </div>
-        {s.myLines.length === 0 && (
-          <div class="empty-mine">Nothing yet — <button onClick={() => act.go('menu')}>add from the menu</button></div>
+        {d.people.length === 0 && (
+          <div class="empty-mine">Nobody is on this check yet — <button onClick={() => act.openIdentity(false)}>add your name</button></div>
         )}
-        {s.myLines.length > 0 && (
-          <div class="lines">
-            {s.myLines.map(l => (
-              <div class="line" key={l.key}>
-                <div class="thumb"><Photo /></div>
-                <div class="t"><b>{l.name}</b><small>{l.sent ? `round ${l.round} · sent · ` : ''}{l.desc}</small></div>
-                {l.sent
-                  ? <span class="qtys">×{l.qty}</span>
-                  : (
-                    <div class="pill-step">
-                      <button class="dec" onClick={() => act.qty(l.key, -1)} aria-label={l.qty === 1 ? 'Remove' : 'Fewer'}>−</button>
-                      <span>{l.qty}</span>
-                      <button onClick={() => act.qty(l.key, 1)} aria-label="More">+</button>
+
+        {d.people.map(p => {
+          const isMe = p.id === d.currentGuestId;
+          const total = p.lines.reduce((a, l) => a + l.unit * l.qty, 0);
+          return (
+            <div key={p.id}>
+              <div class={`person${isMe ? ' me' : ''}`}>
+                <Avatar {...p} size={28} />
+                <span class="name">{p.name} {isMe && <span>· you</span>}</span>
+                <button class="mini-switch" onClick={() => act.selectGuest(p.id)}>{isMe ? 'Ordering' : 'Order as'}</button>
+                <span class="rule" />
+                <span class="sub">{fmt(total)}</span>
+              </div>
+              {p.lines.length === 0 && <div class="empty-mine">No items yet for {p.name}.</div>}
+              {p.lines.length > 0 && (
+                <div class="lines">
+                  {p.lines.map(l => (
+                    <div class="line" key={l.key}>
+                      <div class="thumb"><Photo /></div>
+                      <div class="t"><b>{l.name}</b><small>{l.sent ? `round ${l.round} · sent · ` : ''}{l.desc}</small></div>
+                      {l.sent || !isMe
+                        ? <span class="qtys">×{l.qty}</span>
+                        : (
+                          <div class="pill-step">
+                            <button class="dec" onClick={() => act.qty(l.key, -1)} aria-label={l.qty === 1 ? 'Remove' : 'Fewer'}>−</button>
+                            <span>{l.qty}</span>
+                            <button onClick={() => act.qty(l.key, 1)} aria-label="More">+</button>
+                          </div>
+                        )}
+                      <span class="amt">{fmt(l.unit * l.qty)}</span>
                     </div>
-                  )}
-                <span class="amt">{fmt(l.unit * l.qty)}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {d.others.map(p => (
-          <div key={p.id}>
-            <div class="person">
-              <Avatar {...p} size={28} />
-              <span class="name">{p.name}</span>
-              <span class="rule" />
-              {p.lines.length
-                ? <span class="sub">{fmt(p.lines.reduce((a, l) => a + l.unit * l.qty, 0))}</span>
-                : <span class="sub picking">still picking…</span>}
+                  ))}
+                </div>
+              )}
             </div>
-            {p.lines.length > 0 && (
-              <div class="lines">
-                {p.lines.map((l, i) => (
-                  <div class="line" key={i}>
-                    <div class="thumb"><Photo /></div>
-                    <div class="t"><b>{l.name}</b><small>{l.korean}{l.shared ? ' · shared' : ''}</small></div>
-                    <span class="qtys">×{l.qty}</span>
-                    <span class="amt">{fmt(l.unit * l.qty)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
 
+        {d.canAddPeople && <button class="add-person" onClick={() => act.openIdentity(false)}>+ Add another person to check</button>}
+        {!d.canAddPeople && <div class="name-hint warn">Maximum 10 people on one check.</div>}
         {s.sendNote && <div class="sent-banner">✓ {s.sendNote}</div>}
       </div>
 

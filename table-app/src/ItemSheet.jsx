@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { Avatar, Photo } from './ui.jsx';
-import { ME, SAUCES } from './config.js';
+import { SAUCES } from './config.js';
 import { fmt } from './money.js';
 
 export function ItemSheet({ menu, s, d, act }) {
@@ -68,8 +68,9 @@ export function ItemSheet({ menu, s, d, act }) {
           </div>
 
           <div class="identity">
-            <Avatar {...ME} />
-            <span>Ordering as <b>{ME.name}</b></span>
+            {d.currentGuest ? <Avatar {...d.currentGuest} /> : <span class="av av-26 av-empty">?</span>}
+            <span>Ordering as <b>{d.currentGuest?.name || 'Name yourself first'}</b></span>
+            <button class="identity-change" onClick={() => act.openIdentity(false)}>{d.currentGuest ? 'Switch' : 'Add name'}</button>
           </div>
         </div>
 
@@ -79,7 +80,13 @@ export function ItemSheet({ menu, s, d, act }) {
             <span>{sh.qty}</span>
             <button onClick={() => act.patchSheet({ qty: sh.qty + 1 })} aria-label="More">+</button>
           </div>
-          <button class="btn-add" disabled={info.needSauce} onClick={act.addFromSheet}>
+          <button
+            class="btn-add"
+            disabled={info.needSauce}
+            onPointerDown={() => d.needsIdentity && act.openIdentity(true)}
+            onMouseDown={() => d.needsIdentity && act.openIdentity(true)}
+            onClick={() => (d.needsIdentity ? act.openIdentity(true) : act.addFromSheet())}
+          >
             <span>{info.needSauce ? 'Pick a sauce first' : 'Add to table cart'}</span>
             <span>{fmt(info.total)}</span>
           </button>

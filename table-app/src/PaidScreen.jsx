@@ -1,4 +1,4 @@
-import { ME, HAPPY_HOUR_LINE } from './config.js';
+import { HAPPY_HOUR_LINE } from './config.js';
 import { fmt } from './money.js';
 
 export function PaidScreen({ s, d, act }) {
@@ -8,7 +8,7 @@ export function PaidScreen({ s, d, act }) {
       <div class="paid">
         <div class="stamp"><div>계산<br />완료</div></div>
         <h1>ALL PAID.<br />GOODNIGHT, TABLE {d.tableId}</h1>
-        <div class="sum">{fmt(paid.amount)} · {paid.method} · receipt texted to {ME.name}.</div>
+        <div class="sum">{fmt(paid.amount)} · {paid.method} · receipt texted to {d.currentGuest?.name || 'the table'}.</div>
         <div class="comeback">
           <div class="kr">또 오세요 — come back soon</div>
           <small>{HAPPY_HOUR_LINE}</small>

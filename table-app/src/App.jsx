@@ -7,6 +7,7 @@ import { ItemSheet } from './ItemSheet.jsx';
 import { CartScreen } from './CartScreen.jsx';
 import { CheckoutScreen } from './CheckoutScreen.jsx';
 import { PaidScreen } from './PaidScreen.jsx';
+import { IdentityPrompt } from './IdentityPrompt.jsx';
 
 export function App() {
   const [menu, setMenu] = useState(null);
@@ -66,6 +67,7 @@ function Session({ menu }) {
       {s.screen === 'checkout' && <CheckoutScreen s={s} d={d} act={act} />}
       {s.screen === 'paid' && <PaidScreen s={s} d={d} act={act} />}
       {s.screen === 'menu' && s.sheet && <ItemSheet menu={menu} s={s} d={d} act={act} />}
+      <IdentityPrompt s={s} d={d} act={act} />
       <Toast key={s.toastSeq} text={s.toast} />
     </>
   );

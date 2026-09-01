@@ -1,5 +1,5 @@
 import { Avatar, TopBar } from './ui.jsx';
-import { ME, TIPS, PAY_METHODS } from './config.js';
+import { TIPS, PAY_METHODS } from './config.js';
 import { fmt, fraction } from './money.js';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'];
@@ -14,7 +14,7 @@ export function CheckoutScreen({ s, d, act }) {
         right={<span class="hand">잘 먹었습니다</span>} />
 
       <div class="co-scroll sc">
-        {d.seeded && (
+        {d.people.length > 1 && (
           <div class="seg" role="tablist">
             <button class={d.modeOne ? 'on' : ''} role="tab" aria-selected={d.modeOne} onClick={() => act.setPayMode('one')}>One bill</button>
             <button class={split ? 'on' : ''} role="tab" aria-selected={split} onClick={() => act.setPayMode('split')}>Split by person</button>
@@ -101,7 +101,7 @@ function Split({ s, d, act }) {
           )}
           <div class="shares">
             {d.people.map(p => {
-              const me = p.id === ME.id;
+              const me = p.id === d.currentGuestId;
               const amt = mode === 'even' ? d.evenShare : d.byItems.shares[p.id];
               return (
                 <div class={`share${me ? ' me' : ''}`} key={p.id}>
@@ -130,7 +130,7 @@ function Split({ s, d, act }) {
               return (
                 <button key={p.id} class={`crow${sel ? ' sel' : ''}`} onClick={() => act.selectCustom(p.id)} aria-pressed={sel}>
                   <Avatar {...p} size={30} />
-                  <span class="t"><b>{p.name} {p.id === ME.id && <span>· you</span>}</b><small>{sel ? 'typing…' : ' '}</small></span>
+                  <span class="t"><b>{p.name} {p.id === d.currentGuestId && <span>· you</span>}</b><small>{sel ? 'typing…' : ' '}</small></span>
                   <span class="amt">${s.custom[p.id] === '' ? '0' : s.custom[p.id]}</span>
                 </button>
               );
