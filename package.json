@@ -1,0 +1,16 @@
+{
+  "name": "kochi-dine-in-table-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run check && vite build",
+    "preview": "vite preview",
+    "check": "node --check api/round.js && node -e \"JSON.parse(require('fs').readFileSync('public/data/menu.json','utf8')); console.log('menu json ok')\""
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "preact": "^10.29.8",
+    "vite": "^8.2.2"
+  }
+}

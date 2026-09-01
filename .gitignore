@@ -1,0 +1,7 @@
+node_modules
+.vercel
+dist
+.env
+.DS_Store
+# Vite build output for the dine-in app (built by Vercel on deploy)
+public/table
