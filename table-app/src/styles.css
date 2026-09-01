@@ -110,7 +110,7 @@ input { font: inherit; }
 
 /* ---------- bottom sheet ---------- */
 .dim { position: absolute; inset: 0; background: rgba(5,4,7,.62); animation: fade .2s ease-out; }
-.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 88%; background: var(--surface); border: 1px solid var(--hair-2); border-bottom: 0; border-radius: 30px 30px 0 0; display: flex; flex-direction: column; overflow: hidden; animation: slideup .25s ease-out; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 88%; background: var(--surface); border: 1px solid var(--hair-2); border-bottom: 0; border-radius: 30px 30px 0 0; display: flex; flex-direction: column; overflow: hidden; }
 .handle { display: grid; place-items: center; padding: 10px 0 0; flex: none; }
 .handle span { width: 40px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.2); }
 .sheet-scroll { padding: 10px 20px 118px; }
@@ -282,11 +282,32 @@ input { font: inherit; }
 /* ---------- toast ---------- */
 .toast { position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%); background: rgba(20,19,23,.96); border: 1px solid var(--hair-3); border-radius: 999px; padding: 9px 14px; font-size: 11.5px; font-weight: 800; color: var(--text); white-space: nowrap; animation: rise .25s ease-out; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 
+/* ---------- skeleton (loading) ---------- */
+.skeleton { pointer-events: none; }
+.sk { display: block; border-radius: 8px; background: linear-gradient(100deg, var(--well) 30%, rgba(255,255,255,.09) 50%, var(--well) 70%); background-size: 220% 100%; animation: shimmer 1.3s ease-in-out infinite; }
+.sk-tag { width: 84px; height: 12px; border-radius: 6px; }
+.sk-cat { width: 100%; height: 58px; border-radius: 16px; margin-bottom: 6px; }
+.sk-head { width: 140px; height: 22px; }
+.sk-card { border-radius: 18px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--hair); padding-bottom: 12px; }
+.sk-art { width: 100%; height: 96px; border-radius: 0; }
+.sk-name { width: 72%; height: 13px; margin: 12px 10px 0; }
+.sk-price { width: 34%; height: 12px; margin: 10px 10px 0; }
+
 /* ---------- motion ---------- */
-@keyframes slideup { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
+/* Item sheet visibly slides up from the very bottom of the frame. */
+@keyframes slideup { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 @keyframes blink { to { visibility: hidden; } }
 @keyframes stamp { from { transform: rotate(-8deg) scale(1.6); opacity: 0; } to { transform: rotate(-8deg) scale(1); opacity: 1; } }
+@keyframes shimmer { from { background-position: 180% 0; } to { background-position: -80% 0; } }
+/* Phone-app screen transitions: forward screens slide in from the right, back/menu cross-fades. */
+@keyframes slideInRight { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes popCount { 0% { transform: scale(1); } 30% { transform: scale(1.32); } 100% { transform: scale(1); } }
+.sheet { animation: slideup .3s cubic-bezier(.22,.9,.3,1); }
+.view.enter-right { animation: slideInRight .28s cubic-bezier(.22,.9,.3,1); }
+.view.enter-fade { animation: fade .22s ease-out; }
+.view.enter-pay { animation: fade .24s ease-out; }
+.cartbar .count { animation: popCount .3s ease-out; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

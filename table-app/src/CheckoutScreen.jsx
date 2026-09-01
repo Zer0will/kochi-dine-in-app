@@ -9,7 +9,7 @@ export function CheckoutScreen({ s, d, act }) {
   const split = !d.modeOne;
 
   return (
-    <div class="view">
+    <div class="view enter-right">
       <TopBar onBack={() => act.go('cart')} title="CLOSE OUT" sub={`Table ${d.tableId} · all rounds sent`}
         right={<span class="hand">잘 먹었습니다</span>} />
 

@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "npm run check && vite build && npm run table-entrypoints",
     "preview": "vite preview",
-    "check": "node --check api/round.js && node -e \"JSON.parse(require('fs').readFileSync('public/data/menu.json','utf8')); console.log('menu json ok')\"",
+    "check": "node --check api/round.js && node scripts/regression-check.mjs && node -e \"JSON.parse(require('fs').readFileSync('public/data/menu.json','utf8')); console.log('menu json ok')\"",
     "table-entrypoints": "node scripts/table-entrypoints.mjs"
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ import { fmt } from './money.js';
 export function MenuScreen({ menu, s, d, act }) {
   const cat = d.category;
   return (
-    <div class="view">
+    <div class="view enter-fade">
       <div class="menu-head">
         <div class="brand-row">
           <div class="brand">코치<span>포차</span></div>
@@ -60,9 +60,11 @@ export function MenuScreen({ menu, s, d, act }) {
         </section>
       </div>
 
-      {d.cartCount > 0 && (
+      {/* Only surface the floating cart once *I* have ordered — seeded demo guests
+          shouldn't make the CTA show items/total before I add my own item. */}
+      {d.myCount > 0 && (
         <button class="cartbar" onClick={() => act.go('cart')}>
-          <span class="count">{d.cartCount}</span>
+          <span class="count" key={d.cartCount}>{d.cartCount}</span>
           <span class="t">
             <b>{d.seeded ? `Table cart · ${d.ordering} ordering` : 'Your order'}</b>
             <small>{s.roundsSent ? `Round ${s.roundsSent} sent · add round ${s.roundsSent + 1}` : "Send to kitchen when everyone's in"}</small>

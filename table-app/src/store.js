@@ -33,7 +33,9 @@ export const initialState = {
   payIdx: 0,
   custom: emptyCustom(),
   customSel: ME.id,
-  paid: null                 // { amount, method }
+  paid: null,                // { amount, method }
+  toast: null,               // transient add-to-cart microcopy (never persisted)
+  toastSeq: 0                // bumps on every add so the toast/pulse animation replays
 };
 
 const PERSISTED = ['myLines', 'roundsSent', 'tipIdx', 'payIdx', 'screen', 'payMode', 'splitMode'];
@@ -42,7 +44,7 @@ function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
     if (!saved) return initialState;
-    const s = { ...initialState, ...saved, custom: emptyCustom(), sheet: null, sending: false, sendNote: null };
+    const s = { ...initialState, ...saved, custom: emptyCustom(), sheet: null, sending: false, sendNote: null, toast: null, toastSeq: 0 };
     if (s.screen === 'paid') s.screen = 'menu';
     return s;
   } catch { return initialState; }
@@ -68,8 +70,9 @@ function reducer(s, a) {
       const myLines = s.myLines.slice();
       if (idx >= 0) myLines[idx] = { ...myLines[idx], qty: myLines[idx].qty + line.qty };
       else myLines.push(line);
-      return { ...s, myLines, sheet: null };
+      return { ...s, myLines, sheet: null, toast: `Added · ${line.name}`, toastSeq: s.toastSeq + 1 };
     }
+    case 'clearToast': return s.toast ? { ...s, toast: null } : s;
     case 'qty': {
       const myLines = s.myLines.slice();
       const i = myLines.findIndex(l => l.key === a.key);
@@ -101,6 +104,13 @@ function reducer(s, a) {
 export function useTableSession(menu) {
   const [s, dispatch] = useReducer(reducer, null, load);
   useEffect(() => { persist(s); }, [s]);
+
+  // Auto-dismiss the add-to-cart toast a moment after it appears.
+  useEffect(() => {
+    if (!s.toast) return;
+    const t = setTimeout(() => dispatch({ type: 'clearToast' }), 1600);
+    return () => clearTimeout(t);
+  }, [s.toastSeq]);
 
   const d = useMemo(() => derive(s, menu), [s, menu]);
 
@@ -207,7 +217,8 @@ export function derive(s, menu) {
   const subtotal = mySub + sumLines(otherLines);
   const totals = billTotals({ subtotal, taxRate, tipRate });
 
-  const cartCount = s.myLines.reduce((a, l) => a + l.qty, 0) + otherLines.reduce((a, l) => a + l.qty, 0);
+  const myCount = s.myLines.reduce((a, l) => a + l.qty, 0);
+  const cartCount = myCount + otherLines.reduce((a, l) => a + l.qty, 0);
   const unsentLines = s.myLines.filter(l => !l.sent);
   const ordering = (s.myLines.length ? 1 : 0) + others.filter(p => p.lines.length).length;
 
@@ -259,7 +270,7 @@ export function derive(s, menu) {
 
   return {
     tableId, seeded, others, people, n, category, taxRate, tipRate,
-    mySub, otherLines, subtotal, ...totals, cartCount, unsentLines, ordering,
+    mySub, otherLines, subtotal, ...totals, myCount, cartCount, unsentLines, ordering,
     roundLabel: `round ${s.roundsSent + 1}`,
     sheet,
     byItems, sharedLabel, itemDetail, evenShare, custom,

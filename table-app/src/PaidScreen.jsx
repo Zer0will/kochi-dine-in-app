@@ -4,7 +4,7 @@ import { fmt } from './money.js';
 export function PaidScreen({ s, d, act }) {
   const paid = s.paid || { amount: 0, method: 'Apple Pay' };
   return (
-    <div class="view">
+    <div class="view enter-pay">
       <div class="paid">
         <div class="stamp"><div>계산<br />완료</div></div>
         <h1>ALL PAID.<br />GOODNIGHT, TABLE {d.tableId}</h1>

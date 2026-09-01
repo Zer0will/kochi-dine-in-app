@@ -7,9 +7,8 @@ export function CartScreen({ s, d, act }) {
   const ctaLabel = s.sending ? 'Sending…' : d.unsentLines.length ? `Send round${s.roundsSent ? ` ${s.roundsSent + 1}` : ''} to kitchen` : 'Close out & pay';
 
   return (
-    <div class="view">
-      <TopBar onBack={() => act.go('menu')} title="TABLE CART" sub={`Table ${d.tableId} · one bill · ${d.roundLabel}`}
-        right={<span class="live"><i />LIVE</span>} />
+    <div class="view enter-right">
+      <TopBar onBack={() => act.go('menu')} title="TABLE CART" sub={`Table ${d.tableId} · one bill · ${d.roundLabel}`} />
 
       <div class="cart-scroll sc">
         <div class="person">
