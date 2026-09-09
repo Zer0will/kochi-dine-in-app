@@ -3,7 +3,7 @@ import { fmt } from './money.js';
 
 export function CartScreen({ s, d, act }) {
   const pct = Math.round(d.taxRate * 10000) / 100;
-  const ctaLabel = s.sending ? 'Sending…' : d.unsentLines.length ? `Send round${s.roundsSent ? ` ${s.roundsSent + 1}` : ''} to kitchen` : 'Close out & pay';
+  const ctaLabel = s.sending ? 'Previewing…' : d.unsentLines.length ? `Preview round${s.roundsSent ? ` ${s.roundsSent + 1}` : ''}` : 'Preview checkout';
 
   return (
     <div class="view enter-right">
@@ -32,7 +32,7 @@ export function CartScreen({ s, d, act }) {
                   {p.lines.map(l => (
                     <div class="line" key={l.key}>
                       <div class="thumb"><Photo /></div>
-                      <div class="t"><b>{l.name}</b><small>{l.sent ? `round ${l.round} · sent · ` : ''}{l.desc}</small></div>
+                      <div class="t"><b>{l.name}</b><small>{l.sent ? `round ${l.round} · previewed · ` : ''}{l.desc}</small></div>
                       {l.sent || !isMe
                         ? <span class="qtys">×{l.qty}</span>
                         : (
@@ -53,7 +53,7 @@ export function CartScreen({ s, d, act }) {
 
         {d.canAddPeople && <button class="add-person" onClick={() => act.openIdentity(false)}>+ Add another person to check</button>}
         {!d.canAddPeople && <div class="name-hint warn">Maximum 10 people on one check.</div>}
-        {s.sendNote && <div class="sent-banner">✓ {s.sendNote}</div>}
+        {s.sendNote && <div class="sent-banner" role="status">{s.sendNote}</div>}
       </div>
 
       <div class="bottombar">

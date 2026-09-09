@@ -7,7 +7,7 @@ export function MenuScreen({ menu, s, d, act }) {
     <div class="view enter-fade">
       <div class="menu-head">
         <div class="brand-row">
-          <div class="brand">코치<span>포차</span></div>
+          <h1 class="brand" aria-label="Kochi Po-cha menu">코치<span>포차</span></h1>
           <div class="table-tag">TABLE {d.tableId} · {d.people.length}/{d.maxPeople} ON CHECK</div>
         </div>
         <button class="party" onClick={() => act.openIdentity(false)} aria-label="People on this check">
@@ -33,12 +33,12 @@ export function MenuScreen({ menu, s, d, act }) {
 
         <section class="grid-wrap sc" key={cat.key} aria-label={cat.en}>
           <div class="section-head">
-            <span class="en">{cat.en}</span>
+            <h2 class="en">{cat.en}</h2>
             <span class="kr">{cat.sub}</span>
           </div>
           <div class="grid">
             {cat.items.map(it => (
-              <button key={it.id} class="card" onClick={() => act.openSheet(it.id)}>
+              <button key={it.id} class="card" aria-label={`View ${it.name}, ${fmt(it.price)}`} onClick={() => act.openSheet(it.id)}>
                 <div class="art">
                   <Photo src={it.photo} alt="" />
                   {it.korean && <span class="kr">{it.korean}</span>}
@@ -62,7 +62,7 @@ export function MenuScreen({ menu, s, d, act }) {
           <span class="count" key={d.cartCount}>{d.cartCount}</span>
           <span class="t">
             <b>Table cart · {d.ordering || 1} ordering</b>
-            <small>{s.roundsSent ? `Round ${s.roundsSent} sent · add round ${s.roundsSent + 1}` : "Send to kitchen when everyone's in"}</small>
+            <small>{s.roundsSent ? `Round ${s.roundsSent} previewed · add round ${s.roundsSent + 1}` : "Preview a round when everyone's ready"}</small>
           </span>
           <span class="total">{fmt(d.subtotal)}</span>
         </button>

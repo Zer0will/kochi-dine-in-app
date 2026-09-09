@@ -43,3 +43,17 @@ assert.match(css, /\.view\.enter-right/, 'screen slide-right transition exists')
 assert.match(css, /\.cartbar \.count/, 'cart count pulse animation exists');
 
 console.log('ui regression checks ok');
+
+// Behavioral coverage for the previously lost/incorrectly-confirmed round flow.
+const { reducer } = await import('../table-app/src/store.js');
+const { requestRound } = await import('../table-app/src/round.js');
+const pending = { ...initialState, sending: true, myLines: [{ key: 'sample', sent: false, qty: 1 }], roundsSent: 0 };
+const failed = reducer(pending, { type: 'sendFailed', note: 'Try again' });
+assert.equal(failed.sending, false);
+assert.equal(failed.roundsSent, 0);
+assert.equal(failed.myLines[0].sent, false, 'failed round stays editable and retryable');
+await assert.rejects(() => requestRound({}, async () => ({ ok: false })));
+await assert.rejects(() => requestRound({}, async () => ({ ok: true, json: async () => ({ ok: false }) })));
+const accepted = await requestRound({}, async () => ({ ok: true, json: async () => ({ ok: true, roundId: 'PREVIEW-1' }) }));
+assert.equal(accepted.roundId, 'PREVIEW-1');
+console.log('round failure and preview acceptance checks ok');

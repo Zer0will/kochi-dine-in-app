@@ -10,7 +10,7 @@ export function CheckoutScreen({ s, d, act }) {
 
   return (
     <div class="view enter-right">
-      <TopBar onBack={() => act.go('cart')} title="CLOSE OUT" sub={`Table ${d.tableId} · all rounds sent`}
+      <TopBar onBack={() => act.go('cart')} title="CLOSE OUT" sub={`Table ${d.tableId} · all rounds previewed`}
         right={<span class="hand">잘 먹었습니다</span>} />
 
       <div class="co-scroll sc">

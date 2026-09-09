@@ -1,24 +1,22 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
 import { Avatar, Photo } from './ui.jsx';
 import { SAUCES } from './config.js';
 import { fmt } from './money.js';
+import { useDialogFocus } from './useDialogFocus.js';
 
 export function ItemSheet({ menu, s, d, act }) {
   const sh = s.sheet, info = d.sheet;
   const ref = useRef();
-  useEffect(() => {
-    const onKey = e => { if (e.key === 'Escape') act.closeSheet(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [act]);
+  useDialogFocus(ref, !!sh && !s.identityOpen, act.closeSheet);
   if (!sh || !info) return null;
   const it = info.item;
 
   return (
     <>
       <div class="dim" onClick={act.closeSheet} />
-      <div class="sheet" role="dialog" aria-modal="true" aria-label={it.name} ref={ref}>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label={it.name} ref={ref} tabIndex={-1}>
         <div class="handle"><span /></div>
+        <button class="sheet-close" onClick={act.closeSheet} aria-label="Close item details">×</button>
         <div class="sheet-scroll sc">
           <div class="hero">
             <Photo src={it.photo} alt="" />
@@ -32,18 +30,20 @@ export function ItemSheet({ menu, s, d, act }) {
           {it.description && <div class="desc">{it.description}{it.sauces ? ' Pick your sauce below.' : ''}</div>}
 
           {it.sauces && (
-            <div class="group" role="radiogroup" aria-label="Sauce">
+            <fieldset class="group sauce-group">
+              <legend class="sr-only">Sauce, required</legend>
               <div class="group-head"><span class="lbl">SAUCE</span><span class="req">REQUIRED · PICK 1</span></div>
               <div class="rows">
                 {SAUCES.map((sa, i) => (
-                  <button key={sa.id} class={`row${sh.sauce === i ? ' on' : ''}`} role="radio" aria-checked={sh.sauce === i} onClick={() => act.patchSheet({ sauce: i })}>
+                  <label key={sa.id} class={`row${sh.sauce === i ? ' on' : ''}`}>
+                    <input class="native-choice" type="radio" name="item-sauce" checked={sh.sauce === i} onChange={() => act.patchSheet({ sauce: i })} />
                     <span class="radio"><i /></span>
                     <span class="lbl">{sa.en}{sa.kr && <span class="kr">{sa.kr}</span>}</span>
                     {sa.spicy && <span class="spicy">SPICY</span>}
-                  </button>
+                  </label>
                 ))}
               </div>
-            </div>
+            </fieldset>
           )}
 
           <div class="group">
@@ -52,19 +52,20 @@ export function ItemSheet({ menu, s, d, act }) {
               {menu.extras.map(ex => {
                 const on = !!sh.extras[ex.id];
                 return (
-                  <button key={ex.id} class={`row${on ? ' checked' : ''}`} role="checkbox" aria-checked={on} onClick={() => act.patchSheet({ extras: { ...sh.extras, [ex.id]: !on } })}>
+                  <label key={ex.id} class={`row${on ? ' checked' : ''}`}>
+                    <input class="native-choice" type="checkbox" checked={on} onChange={() => act.patchSheet({ extras: { ...sh.extras, [ex.id]: !on } })} />
                     <span class="check">✓</span>
                     <span class="lbl ex">{ex.en}{ex.kr && <span class="kr">{ex.kr}</span>}</span>
                     <span class="amt">+{fmt(ex.price)}</span>
-                  </button>
+                  </label>
                 );
               })}
             </div>
           </div>
 
           <div class="group">
-            <div class="group-head"><span class="lbl">NOTE FOR KITCHEN</span></div>
-            <input class="note" value={sh.note} placeholder="Extra crispy please…" maxLength={140} onInput={e => act.patchSheet({ note: e.currentTarget.value })} />
+            <div class="group-head"><label class="lbl" for="kitchen-note">NOTE FOR KITCHEN</label></div>
+            <input id="kitchen-note" class="note" value={sh.note} placeholder="Extra crispy please…" maxLength={140} onInput={e => act.patchSheet({ note: e.currentTarget.value })} />
           </div>
 
           <div class="identity">
@@ -83,8 +84,6 @@ export function ItemSheet({ menu, s, d, act }) {
           <button
             class="btn-add"
             disabled={info.needSauce}
-            onPointerDown={() => d.needsIdentity && act.openIdentity(true)}
-            onMouseDown={() => d.needsIdentity && act.openIdentity(true)}
             onClick={() => (d.needsIdentity ? act.openIdentity(true) : act.addFromSheet())}
           >
             <span>{info.needSauce ? 'Pick a sauce first' : 'Add to table cart'}</span>

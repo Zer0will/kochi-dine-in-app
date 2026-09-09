@@ -1,3 +1,4 @@
+import { requestRound } from './round.js';
 import { useReducer, useEffect, useMemo, useCallback } from 'preact/hooks';
 import { SAUCES, TIPS, DEFAULT_TIP_INDEX, PAY_METHODS } from './config.js';
 import { sumLines, billTotals, sharesByItems, customSplit, pressKey, fmt, fraction } from './money.js';
@@ -84,7 +85,7 @@ function persist(s) {
   } catch { /* private mode etc. — the session just won't survive a refresh */ }
 }
 
-function reducer(s, a) {
+export function reducer(s, a) {
   switch (a.type) {
     case 'go': return { ...s, screen: a.screen, sheet: null, identityOpen: false, pendingAdd: false };
     case 'cat': return { ...s, cat: a.cat };
@@ -231,11 +232,10 @@ export function useTableSession(menu) {
       subtotal: Math.round(sumLines(d.unsentLines) * 100) / 100
     };
     try {
-      const res = await fetch('/api/round', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      dispatch({ type: 'sent', note: `Round ${round} sent to kitchen — add more anytime` });
+      await requestRound(payload);
+      dispatch({ type: 'sent', note: `Round ${round} preview complete — no kitchen notification was sent` });
     } catch (err) {
-      dispatch({ type: 'sent', note: `Round ${round} saved — kitchen link offline (${err.message})` });
+      dispatch({ type: 'sendFailed', note: 'Preview unavailable. Your items are still in the cart; try again.' });
     }
   }, [s.sending, s.roundsSent, d.unsentLines, d.currentGuest, d.people]);
 
@@ -324,7 +324,7 @@ export function derive(s, menu) {
   const method = PAY_METHODS[s.payIdx];
   const payBtnLabel = customBlocked
     ? `Lock shares — ${fmt(Math.abs(custom.left))}${custom.left >= 0 ? ' unassigned' : ' over'}`
-    : method.id === 'counter' ? 'Pay at the counter' : `Pay ${fmt(payAmt)} with ${method.name}`;
+    : method.id === 'counter' ? 'Preview counter payment' : `Preview ${fmt(payAmt)} with ${method.name}`;
 
   const billLines = s.myLines.map(l => ({
     label: l.name,

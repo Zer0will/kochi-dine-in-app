@@ -81,3 +81,11 @@ dine-in app into `public/table/`) and serves `public/`. Serverless functions liv
 ## Safety
 
 No secrets are stored in the repo. Add production credentials only as Vercel environment variables.
+
+## Website quality review
+
+Run `npm ci` and `npm run build`. Existing checks plus round-failure regression checks run as part of the build. Tests use mock requests and do not contact a kitchen or payment provider.
+
+This app is an interactive preview. The API returns `preview_no_kitchen_notification`; the UI now identifies previews and never claims payment, a texted receipt, or an actual kitchen notification. Failed round requests leave items editable and retryable. Live ordering/payment requires a separate verified integration.
+
+Menu images are preserved from JSON when provided and use a branded fallback on missing/failed images. Page headings, a retry action, native sauce/extra controls, item close buttons, modal focus management, and mobile input sizing improve usability. Desktop preview and real-phone layout styles are retained.
