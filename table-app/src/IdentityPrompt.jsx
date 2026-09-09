@@ -1,24 +1,16 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
 import { Avatar } from './ui.jsx';
+import { useDialogFocus } from './useDialogFocus.js';
 
 export function IdentityPrompt({ s, d, act }) {
   const inputRef = useRef(null);
+  const dialogRef = useRef(null);
+  useDialogFocus(dialogRef, s.identityOpen, act.closeIdentity);
   const isFull = !d.canAddPeople;
   const title = s.pendingAdd ? 'Who is this for?' : 'Join this check';
   const help = s.pendingAdd
     ? 'Name yourself before this item goes into the table cart.'
     : 'Pick your name or add a new person to the shared check.';
-
-  useEffect(() => {
-    const onKey = e => { if (e.key === 'Escape' && !s.pendingAdd) act.closeIdentity(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [s.pendingAdd, act]);
-
-  useEffect(() => {
-    if (!s.identityOpen) return;
-    setTimeout(() => inputRef.current?.focus(), 30);
-  }, [s.identityOpen]);
 
   if (!s.identityOpen) return null;
 
@@ -34,8 +26,8 @@ export function IdentityPrompt({ s, d, act }) {
 
   return (
     <>
-      <div class="dim identity-dim" onClick={() => !s.pendingAdd && act.closeIdentity()} />
-      <form class="identity-modal" role="dialog" aria-modal="true" aria-label={title} onSubmit={submit}>
+      <div class="dim identity-dim" onClick={act.closeIdentity} />
+      <form class="identity-modal" ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} onSubmit={submit}>
         <div class="modal-kicker">TABLE {d.tableId} · CHECK IDENTITY</div>
         <h2>{title}</h2>
         <p>{help}</p>
@@ -59,7 +51,7 @@ export function IdentityPrompt({ s, d, act }) {
         {isFull && <div class="name-hint warn">Maximum 10 people on one check.</div>}
 
         <div class="modal-actions">
-          {!s.pendingAdd && <button type="button" class="btn-ghost" onClick={act.closeIdentity}>Cancel</button>}
+          <button type="button" class="btn-ghost" onClick={act.closeIdentity}>Cancel</button>
           <button type="submit" class="btn-primary" disabled={isFull}>Continue</button>
         </div>
       </form>

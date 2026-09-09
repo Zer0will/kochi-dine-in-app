@@ -74,8 +74,8 @@ export const SEED_GUESTS = [
 ];
 
 export const PAY_METHODS = [
-  { id: 'applepay', name: 'Apple Pay', detail: 'Instant' },
-  { id: 'card',     name: 'Card', detail: '•••• 4821' },
+  { id: 'applepay', name: 'Apple Pay', detail: 'Demo' },
+  { id: 'card',     name: 'Card', detail: 'Demo — no card collected' },
   { id: 'counter',  name: 'Pay at counter', detail: '현금 OK' }
 ];
 

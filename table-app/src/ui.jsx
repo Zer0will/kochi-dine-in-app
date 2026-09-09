@@ -5,9 +5,11 @@ export function Avatar({ id, color, tc, size = 26, label }) {
   return <span class={`av av-${size}`} style={{ background: color, color: tc }} aria-hidden="true">{label ?? id}</span>;
 }
 
-/** Striped placeholder until real food photography lands. */
+/** Branded fallback when menu photography is missing or unavailable. */
 export function Photo({ src, alt = '' }) {
-  return <div class="ph">{src ? <img src={src} alt={alt} loading="lazy" /> : null}</div>;
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setFailed(false); }, [src]);
+  return <div class="ph">{src && !failed ? <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} /> : <span class="photo-fallback" aria-hidden="true">KOCHI<br /><small>PO-CHA</small></span>}</div>;
 }
 
 /** Live clock in the desktop phone frame; hidden on real phones (the OS has its own). */

@@ -12,14 +12,21 @@ import { IdentityPrompt } from './IdentityPrompt.jsx';
 export function App() {
   const [menu, setMenu] = useState(null);
   const [error, setError] = useState(null);
-  useEffect(() => { loadMenu().then(setMenu).catch(e => setError(e.message)); }, []);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let active = true;
+    setError(null);
+    loadMenu().then(value => { if (active) setMenu(value); }).catch(e => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [attempt]);
 
   return (
     <div class="frame">
       <div class="frame-shell">
         <div class="screen">
           <StatusBar />
-          {menu ? <Session menu={menu} /> : <MenuSkeleton error={error} />}
+          <p class="preview-notice">Interactive preview · No kitchen orders or payments</p>
+          {menu ? <Session menu={menu} /> : <MenuSkeleton error={error} onRetry={() => setAttempt(value => value + 1)} />}
         </div>
       </div>
     </div>
@@ -27,8 +34,8 @@ export function App() {
 }
 
 /** Loading state shaped like the real menu (brand + rail + card grid) rather than a bare line. */
-function MenuSkeleton({ error }) {
-  if (error) return <div class="loading"><div><b>코치<span>포차</span></b>{error}</div></div>;
+function MenuSkeleton({ error, onRetry }) {
+  if (error) return <div class="loading" role="alert"><div><b>코치<span>포차</span></b><p>We couldn’t load the menu.</p><button class="retry-menu" onClick={onRetry}>Try again</button></div></div>;
   return (
     <div class="view skeleton" aria-busy="true" aria-label="Loading the menu">
       <div class="menu-head">

@@ -57,6 +57,7 @@ function toCategory(cfg, cat) {
         korean: i.korean || KR_FALLBACK[i.name] || '',
         price: Number(i.price),
         description: i.description || '',
+        photo: typeof i.photo === 'string' ? i.photo : typeof i.image === 'string' ? i.image : '',
         badge: i.badge || '',
         featured: !!i.featured,
         sauces: !!cfg.sauces
